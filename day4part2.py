@@ -1,11 +1,10 @@
 import argparse
-from heapq import heappush, heappop
 
 parser = argparse.ArgumentParser()
 parser.add_argument('input')
 args = parser.parse_args()
 
-pq = []
+queue = []
 grid = []
 adj = []
 total_rolls = 0
@@ -17,8 +16,9 @@ def update_adj(x, y, init=False):
             if i == 0 and j == 0:
                 continue
             adj[x+i][y+j] += update
-            if not init and grid[x+i][y+j] == '@' and [x+i,y+j] not in pq:
-                heappush(pq, [x+i,y+j])
+            if not init and grid[x+i][y+j] == '@':
+                if adj[x+i][y+j] < 4 and [x+i,y+j] not in queue:
+                    queue.append([x+i,y+j])
 
 with open(args.input) as f:
     lines = f.readlines()
@@ -35,12 +35,12 @@ with open(args.input) as f:
         for j in range(1, width - 1):
             if line[j-1] == '@':
                 update_adj(i, j, init=True)
-                heappush(pq, [i, j])
+                queue.append([i, j])
 
     grid.append(['.' for _ in range(width)])
 
-while pq:
-    x, y = heappop(pq)
+while queue:
+    x, y = queue.pop()
     if adj[x][y] < 4:
         total_rolls += 1
         grid[x][y] = '.'
